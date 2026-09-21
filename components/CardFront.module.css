@@ -1,0 +1,110 @@
+/* The card at page scale. Everything sits inside the trim, against the gutters. */
+.front {
+  position: absolute;
+  inset: 0;
+  padding: var(--gutter-y) var(--gutter-x);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  font-family: var(--serif);
+  color: var(--ink);
+  text-transform: uppercase;
+  /* Letterpress: ink sits below the surface, the fibre above it catches light. */
+  text-shadow: 0 1px 0 rgb(255 255 255 / 0.35);
+}
+
+.name {
+  margin: 0;
+  font-size: clamp(2.1rem, 7.4vw, 7.5rem);
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  line-height: 1.05;
+  /* Tracking adds a trailing gap after the last letter; pull it back so the
+     optical left and right margins match. */
+  margin-right: -0.2em;
+}
+
+.title {
+  margin: clamp(0.9rem, 2vh, 1.6rem) 0 0;
+  font-size: clamp(0.6rem, 1.15vw, 1.05rem);
+  font-weight: 400;
+  letter-spacing: 0.5em;
+  color: var(--ink-soft);
+}
+
+.org {
+  justify-self: start;
+  align-self: end;
+  text-align: left;
+  display: grid;
+  gap: clamp(0.4rem, 1vh, 0.7rem);
+  padding-bottom: clamp(1.2rem, 4vh, 2.6rem);
+  /* Chrome's UA sheet sets text-transform: none on buttons; it is not inherited. */
+  text-transform: uppercase;
+  min-height: 44px;
+  transition: color var(--t-state) var(--ease-out);
+}
+
+.orgLabel {
+  font-size: clamp(0.95rem, 2vw, 1.85rem);
+  letter-spacing: 0.3em;
+  position: relative;
+  display: inline-block;
+}
+
+/* The hairline that admits this line is a door. */
+.orgLabel::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0.3em;
+  bottom: -0.38em;
+  height: 1px;
+  background: var(--rule);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--t-state) var(--ease-out), background var(--t-state);
+}
+
+.org:hover .orgLabel::after,
+.org:focus-visible .orgLabel::after {
+  transform: scaleX(1);
+  background: var(--accent);
+}
+
+.org:hover,
+.org:focus-visible {
+  color: var(--accent);
+}
+
+.orgSub {
+  font-size: clamp(0.55rem, 0.95vw, 0.85rem);
+  letter-spacing: 0.36em;
+  color: var(--ink-soft);
+}
+
+.contact {
+  font-style: normal; /* <address> is italic by default */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem clamp(1.2rem, 3.5vw, 3rem);
+  padding-top: clamp(0.9rem, 2.2vh, 1.6rem);
+  border-top: 1px solid var(--rule);
+  font-size: clamp(0.52rem, 0.82vw, 0.78rem);
+  letter-spacing: 0.26em;
+  color: var(--ink-soft);
+}
+
+@media (max-width: 720px) {
+  .name {
+    letter-spacing: 0.14em;
+  }
+  .title {
+    letter-spacing: 0.34em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orgLabel::after {
+    transition: none;
+  }
+}

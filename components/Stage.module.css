@@ -1,0 +1,80 @@
+/* The scroll runway. Its height is what the turn is spent over. */
+.stage {
+  --p: 0; /* raw scroll progress through the stage, 0 → 1 */
+  --e: 0; /* eased turn progress, 0 → 1 */
+  position: relative;
+  height: 280vh;
+}
+
+.sticky {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* Perspective must live above the card so the 3D chain stays intact. Far
+   enough back that a full-page plane tilting toward the viewer does not
+   balloon past the frame. */
+.perspective {
+  position: absolute;
+  inset: 0;
+  perspective: 3000px;
+  transition: transform var(--t-drawer) var(--ease-out),
+    opacity var(--t-drawer) var(--ease-out);
+}
+
+/* The card gets out of the way when the career drawer takes the stage. */
+.pushed {
+  transform: translateX(-16vw) scale(0.74);
+  opacity: 0.35;
+}
+
+.hint {
+  position: absolute;
+  z-index: 2;
+  bottom: calc(var(--gutter-y) * 0.55);
+  left: 50%;
+  translate: -50% 0;
+  display: grid;
+  justify-items: center;
+  gap: 0.7rem;
+  font-size: clamp(0.5rem, 0.72vw, 0.68rem);
+  font-weight: 400;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  opacity: clamp(0, calc((0.1 - var(--p)) * 10), 1);
+  pointer-events: none;
+  transition: opacity var(--t-state) var(--ease-out);
+}
+
+.hintHidden {
+  opacity: 0;
+}
+
+.hintRule {
+  width: 1px;
+  height: 2.4rem;
+  background: linear-gradient(to bottom, transparent, var(--rule));
+}
+
+@media (max-width: 720px) {
+  .stage {
+    height: 240vh;
+  }
+  .pushed {
+    transform: translateX(-8vw) scale(0.7);
+    opacity: 0.2;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .perspective {
+    perspective: none;
+    transition: opacity var(--t-drawer) var(--ease-out);
+  }
+  .pushed {
+    transform: none;
+  }
+}

@@ -1,0 +1,75 @@
+/* The card IS the page: it fills the viewport edge to edge. Two elements
+   because the turn needs two origins — .lift dips and re-centres about the
+   middle, .flipper hinges on the bottom edge. */
+.lift {
+  position: absolute;
+  inset: 0;
+  --theta: calc(var(--e) * 180deg);
+  /* Recede at the midpoint so the tilted plane stays inside the frame — and so
+     the page briefly becomes an object you can see the edges of. */
+  --k: calc(1 - var(--turn-dip) * sin(var(--theta)));
+
+  /* A 180° turn about the bottom edge lands the card one full height BELOW
+     where it started. The centre of a plane hinged on its bottom edge drops by
+     h/2·(1−cos θ); undoing exactly that pins the bottom edge, so the page
+     sweeps up and over in place. */
+  transform: translateY(calc(var(--k) * -50dvh * (1 - cos(var(--theta)))))
+    scale(var(--k));
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.flipper {
+  position: absolute;
+  inset: 0;
+  transform-origin: center bottom;
+  transform: rotateX(calc(var(--e) * -180deg));
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  background: var(--paper);
+  /* Grain. Without it the page is a rectangle; with it, it is stock. */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+  /* Invisible at rest (the card is flush with the frame), and the thing that
+     makes it read as a physical sheet once it lifts off. */
+  box-shadow:
+    0 0 0 1px var(--paper-edge),
+    0 40px 90px -30px rgba(0, 0, 0, 0.85);
+}
+
+/* The trim: a hairline inset from the page edge. It is what keeps a full-bleed
+   page reading as a card rather than as a background colour. */
+.face::before {
+  content: '';
+  position: absolute;
+  inset: var(--trim);
+  border: 1px solid var(--rule);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.back {
+  transform: rotateX(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lift,
+  .flipper {
+    transform: none;
+  }
+  .face {
+    backface-visibility: visible;
+  }
+  .front {
+    opacity: clamp(0, calc((0.45 - var(--p)) * 6), 1);
+  }
+  .back {
+    transform: none;
+    opacity: clamp(0, calc((var(--p) - 0.45) * 6), 1);
+  }
+}

@@ -1,0 +1,113 @@
+/* ---------------------------------------------------------------------------
+   Tokens. Nothing in a component may hard-code a colour, easing or duration.
+   --------------------------------------------------------------------------- */
+
+:root {
+  --paper: #ede8db;
+  --paper-edge: #e2dbc9;
+  --ink: #26241f;
+  --ink-soft: #6b665a;
+  --rule: #c3bba7;
+  --field: #0d0d09; /* the void the card turns over in */
+  --accent: #6e2a24;
+
+  --serif: 'EB Garamond', 'Iowan Old Style', Palatino, Georgia, serif;
+  --sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --t-state: 180ms;
+  --t-drawer: 420ms;
+
+  /* The card is the page, so its margins are page margins. */
+  --gutter-x: clamp(1.5rem, 7vw, 6.5rem);
+  --gutter-y: clamp(1.75rem, 7vh, 4.5rem);
+  /* Inset hairline — the trim that keeps a full-bleed page reading as stock. */
+  --trim: clamp(0.7rem, 1.6vmin, 1.5rem);
+
+  /* How far the card recedes at the midpoint of its turn. */
+  --turn-dip: 0.22;
+}
+
+/* The card is the whole page now, so dark mode genuinely darkens: dark stock,
+   light ink. A full screen of bone at night is not restraint, it is a torch. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --paper: #1a1915;
+    --paper-edge: #2b2921;
+    --ink: #e9e4d7;
+    --ink-soft: #908a7a;
+    --rule: #3b372e;
+    --field: #000000;
+    --accent: #b5605a;
+  }
+}
+
+:root[data-theme='dark'] {
+  --paper: #1a1915;
+  --paper-edge: #2b2921;
+  --ink: #e9e4d7;
+  --ink-soft: #908a7a;
+  --rule: #3b372e;
+  --field: #000000;
+  --accent: #b5605a;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  background: var(--field);
+}
+
+body {
+  background: var(--field);
+  color: var(--ink);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+body[data-scroll-locked='true'] {
+  overflow: hidden;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* Available to assistive tech, invisible on screen. The card's content is never
+   hidden from a screen reader by the animation. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

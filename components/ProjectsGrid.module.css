@@ -1,0 +1,162 @@
+/* The reverse of the page. Same gutters as the front, so the two faces feel
+   printed on one sheet. */
+.back {
+  position: absolute;
+  inset: 0;
+  padding: var(--gutter-y) var(--gutter-x);
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: clamp(1.2rem, 3.5vh, 2.6rem);
+  /* The reverse only resolves once the page is past edge-on. */
+  opacity: clamp(0, calc((var(--e) - 0.58) * 4.5), 1);
+  transition: opacity 120ms linear;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding-bottom: clamp(0.8rem, 2vh, 1.4rem);
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--serif);
+  text-transform: uppercase;
+}
+
+.heading {
+  margin: 0;
+  font-size: clamp(1.05rem, 2.2vw, 2rem);
+  font-weight: 400;
+  letter-spacing: 0.34em;
+  color: var(--ink);
+}
+
+.count {
+  font-family: var(--sans);
+  font-size: clamp(0.5rem, 0.72vw, 0.7rem);
+  letter-spacing: 0.28em;
+  color: var(--ink-soft);
+}
+
+.careersLink {
+  text-transform: uppercase; /* buttons do not inherit it */
+  font-size: clamp(0.58rem, 0.95vw, 0.88rem);
+  letter-spacing: 0.3em;
+  color: var(--ink-soft);
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  transition: color var(--t-state) var(--ease-out);
+}
+
+.careersLink:hover,
+.careersLink:focus-visible {
+  color: var(--accent);
+}
+
+/* 1px of background showing through the gaps gives the grid its rules. */
+.grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 1fr;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+
+.tile {
+  position: relative;
+  background: var(--paper);
+  padding: clamp(0.9rem, 2.2vh, 1.9rem) clamp(1rem, 1.8vw, 2rem);
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: clamp(0.4rem, 1vh, 0.8rem);
+  min-height: 0;
+  overflow: hidden;
+  font-family: var(--sans);
+  transition: background var(--t-state) var(--ease-out);
+}
+
+.tile:hover {
+  background: var(--paper-edge);
+}
+
+.meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: clamp(0.5rem, 0.72vw, 0.7rem);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.tileTitle {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: clamp(1rem, 1.9vw, 1.8rem);
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.tileTitle a {
+  text-decoration: none;
+}
+
+/* Whole tile is the target; the link keeps the accessible name. */
+.tileTitle a::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.blurb {
+  margin: 0;
+  align-self: start;
+  font-size: clamp(0.72rem, 1.02vw, 0.98rem);
+  font-weight: 300;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+
+.stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em;
+  align-self: end;
+  font-size: clamp(0.5rem, 0.72vw, 0.7rem);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.stack span::after {
+  content: '·';
+  margin-left: 0.5em;
+}
+
+.stack span:last-child::after {
+  content: '';
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 620px) {
+  .grid {
+    grid-template-columns: 1fr;
+    grid-auto-rows: auto;
+  }
+  .back {
+    overflow-y: auto;
+  }
+}

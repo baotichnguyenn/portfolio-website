@@ -1,0 +1,225 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 8, 5, 0.6);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--t-drawer) var(--ease-out);
+  z-index: 40;
+}
+
+.backdropOpen {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 50;
+  width: min(560px, 92vw);
+  height: 100dvh;
+  background: var(--paper);
+  border-left: 1px solid var(--paper-edge);
+  box-shadow: -40px 0 80px -30px rgba(0, 0, 0, 0.8);
+  transform: translateX(100%);
+  transition: transform var(--t-drawer) var(--ease-out),
+    visibility 0s linear var(--t-drawer);
+  visibility: hidden;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  overflow: hidden;
+}
+
+.drawerOpen {
+  transform: translateX(0);
+  visibility: visible;
+  transition: transform var(--t-drawer) var(--ease-out), visibility 0s;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 2rem 2rem 1.2rem;
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--serif);
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: 0.34em;
+  color: var(--ink);
+}
+
+.close {
+  font-family: var(--sans);
+  font-size: 0.62rem;
+  letter-spacing: 0.24em;
+  color: var(--ink-soft);
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  transition: color var(--t-state) var(--ease-out);
+}
+
+.close:hover,
+.close:focus-visible {
+  color: var(--accent);
+}
+
+.body {
+  padding: 2rem 2rem 4rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* ---- the tree ---------------------------------------------------------- */
+
+.tree {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 2.4rem;
+}
+
+.subtree {
+  list-style: none;
+  margin: 1.2rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 1.4rem;
+}
+
+.node {
+  position: relative;
+  padding-left: 1.6rem;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 320ms var(--ease-out), transform 320ms var(--ease-out);
+  transition-delay: calc(var(--i) * 55ms + 120ms);
+}
+
+.nodeVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Trunk: a rule down the left of every node, stopping at the last one. */
+.node::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.45rem;
+  bottom: -1.4rem;
+  border-left: 1px solid var(--rule);
+}
+
+.tree > .node::before {
+  bottom: -2.4rem;
+}
+
+.node:last-child::before {
+  bottom: auto;
+  height: 0;
+}
+
+/* Branch: the elbow out to the role. */
+.node::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.45rem;
+  width: 0.95rem;
+  border-top: 1px solid var(--rule);
+}
+
+.root > .node::after {
+  border-top-color: var(--ink);
+}
+
+.role {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.org {
+  margin: 0.35rem 0 0;
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+
+.period {
+  margin: 0.3rem 0 0;
+  font-size: 0.6rem;
+  font-weight: 300;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.summary {
+  margin: 0.7rem 0 0;
+  font-size: 0.78rem;
+  font-weight: 300;
+  line-height: 1.65;
+  color: var(--ink);
+}
+
+.highlights {
+  margin: 0.7rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.highlights li {
+  position: relative;
+  padding-left: 1rem;
+  font-size: 0.74rem;
+  font-weight: 300;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+
+.highlights li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.6rem;
+  width: 0.45rem;
+  height: 1px;
+  background: var(--rule);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drawer {
+    transform: none;
+    opacity: 0;
+    transition: opacity var(--t-drawer) var(--ease-out),
+      visibility 0s linear var(--t-drawer);
+  }
+  .drawerOpen {
+    opacity: 1;
+  }
+  .node {
+    transform: none;
+    transition-delay: 0s;
+  }
+}
