@@ -25,8 +25,12 @@
   /* Inset hairline — the trim that keeps a full-bleed page reading as stock. */
   --trim: clamp(0.7rem, 1.6vmin, 1.5rem);
 
-  /* How far the card recedes at the midpoint of its turn. */
-  --turn-dip: 0.22;
+  /* How far the card recedes at the midpoint of its turn. At this perspective
+     the plane stays inside the frame on its own (measured across viewports
+     from 390px to 2560px), so this is for weight, not containment: just
+     enough to read as a sheet lifting off, not enough to shrink the page into
+     a widget. The sheen does the work of conveying the rotation. */
+  --turn-dip: 0.08;
 }
 
 /* The card is the whole page now, so dark mode genuinely darkens: dark stock,
@@ -39,7 +43,7 @@
     --ink-soft: #908a7a;
     --rule: #3b372e;
     --field: #000000;
-    --accent: #b5605a;
+    --accent: #c06c64;
   }
 }
 
@@ -50,7 +54,7 @@
   --ink-soft: #908a7a;
   --rule: #3b372e;
   --field: #000000;
-  --accent: #b5605a;
+  --accent: #c06c64;
 }
 
 *,

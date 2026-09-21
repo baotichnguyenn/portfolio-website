@@ -11,6 +11,8 @@ export function CardFront({ onOpenCareers }: { onOpenCareers: () => void }) {
         <p className={styles.title}>{identity.title}</p>
       </header>
 
+      <p className={styles.statement}>{identity.statement}</p>
+
       {/* Where "Pierce & Pierce / Mergers and Acquisitions" sits on the card. */}
       <button
         type="button"

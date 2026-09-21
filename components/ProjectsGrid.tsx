@@ -27,10 +27,12 @@ export function ProjectsGrid({ onOpenCareers }: { onOpenCareers: () => void }) {
               <span>{project.kind}</span>
               <span>{project.year}</span>
             </div>
-            <h3 className={styles.tileTitle}>
-              {project.href ? <a href={project.href}>{project.title}</a> : project.title}
-            </h3>
-            <p className={styles.blurb}>{project.blurb}</p>
+            <div className={styles.tileBody}>
+              <h3 className={styles.tileTitle}>
+                {project.href ? <a href={project.href}>{project.title}</a> : project.title}
+              </h3>
+              <p className={styles.blurb}>{project.blurb}</p>
+            </div>
             <div className={styles.stack}>
               {project.stack.map((tech) => (
                 <span key={tech}>{tech}</span>

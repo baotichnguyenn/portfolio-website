@@ -7,9 +7,10 @@
   display: grid;
   grid-template-rows: auto 1fr;
   gap: clamp(1.2rem, 3.5vh, 2.6rem);
-  /* The reverse only resolves once the page is past edge-on. */
-  opacity: clamp(0, calc((var(--e) - 0.58) * 4.5), 1);
-  transition: opacity 120ms linear;
+  /* The reverse resolves as the page comes back toward the viewer. Driven
+     straight off the angle — a transition here would lag the follower that is
+     already smoothing this value, and the two together read as a pop. */
+  opacity: clamp(0, calc((var(--e) - 0.52) * 3.4), 1);
 }
 
 .head {
@@ -73,7 +74,7 @@
   background: var(--paper);
   padding: clamp(0.9rem, 2.2vh, 1.9rem) clamp(1rem, 1.8vw, 2rem);
   display: grid;
-  grid-template-rows: auto auto 1fr auto;
+  grid-template-rows: auto 1fr auto;
   gap: clamp(0.4rem, 1vh, 0.8rem);
   min-height: 0;
   overflow: hidden;
@@ -93,6 +94,14 @@
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--ink-soft);
+}
+
+/* Title and blurb ride together in the middle of the tile so the meta line
+   and the stack stay locked to the top and bottom rules across the row. */
+.tileBody {
+  align-self: center;
+  display: grid;
+  gap: clamp(0.4rem, 1.1vh, 0.85rem);
 }
 
 .tileTitle {
@@ -118,9 +127,10 @@
 
 .blurb {
   margin: 0;
-  align-self: start;
   font-size: clamp(0.72rem, 1.02vw, 0.98rem);
-  font-weight: 300;
+  /* 300 on bone reads as washed out at body size, whatever the contrast
+     ratio says. Weight, not colour, was the problem here. */
+  font-weight: 400;
   line-height: 1.6;
   color: var(--ink-soft);
 }
@@ -152,11 +162,37 @@
 }
 
 @media (max-width: 620px) {
+  /* One column cannot fit the page, so the reverse stops being a grid that
+     fills the frame and becomes an ordinary scrolling column. Fighting the
+     grid here only ever squeezes the tiles. */
+  .back {
+    display: block;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-bottom: calc(var(--gutter-y) * 2);
+  }
+
   .grid {
     grid-template-columns: 1fr;
-    grid-auto-rows: auto;
+    grid-auto-rows: min-content;
+    margin-top: clamp(1.2rem, 3.5vh, 2.6rem);
   }
+
+  .tile {
+    display: block;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .tileBody {
+    margin: 0.7rem 0 1.1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The face itself handles the fade in this mode; gating on the turn angle
+     too would cancel it out to nothing at the midpoint. */
   .back {
-    overflow-y: auto;
+    opacity: 1;
   }
 }

@@ -6,6 +6,12 @@
 export type Identity = {
   name: string;
   title: string;
+  /**
+   * The one sentence in the middle of the card. Sentence case, not uppercase —
+   * it is the only element on either face that is, deliberately. Keep it under
+   * ~120 characters or it stops being a statement and becomes a paragraph.
+   */
+  statement: string;
   /** Sits where "PIERCE & PIERCE" does on the Paul Allen card. This is the Careers trigger. */
   careersLabel: string;
   careersSub: string;
@@ -42,6 +48,8 @@ export type CareerNode = {
 export const identity: Identity = {
   name: 'Your Name',
   title: 'Software Engineer',
+  statement:
+    'I build systems that hold up under load — ingestion paths, query layers, and the unglamorous middle of the stack.',
   careersLabel: 'Careers',
   careersSub: 'Selected Experience',
   contact: [

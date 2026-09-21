@@ -1,6 +1,6 @@
 /* The card IS the page: it fills the viewport edge to edge. Two elements
    because the turn needs two origins — .lift dips and re-centres about the
-   middle, .flipper hinges on the bottom edge. */
+   middle, .flipper hinges on the top edge. */
 .lift {
   position: absolute;
   inset: 0;
@@ -9,22 +9,31 @@
      the page briefly becomes an object you can see the edges of. */
   --k: calc(1 - var(--turn-dip) * sin(var(--theta)));
 
-  /* A 180° turn about the bottom edge lands the card one full height BELOW
-     where it started. The centre of a plane hinged on its bottom edge drops by
-     h/2·(1−cos θ); undoing exactly that pins the bottom edge, so the page
-     sweeps up and over in place. */
-  transform: translateY(calc(var(--k) * -50dvh * (1 - cos(var(--theta)))))
+  /* A 180° turn about the top edge lands the card one full height ABOVE where
+     it started: the centre of a plane hinged on its top edge rises by
+     h/2·(1−cos θ). Undoing exactly that holds the page in the middle of the
+     frame, so it turns in place instead of climbing out of view. */
+  transform: translateY(calc(var(--k) * 50dvh * (1 - cos(var(--theta)))))
     scale(var(--k));
   transform-style: preserve-3d;
-  will-change: transform;
 }
 
+/* Hinged along the top, turning the bottom edge up and toward the viewer —
+   clockwise seen from the card's right. Grab the lower edge and flip it over
+   the top; the sign of the rotation is what decides that, and reversing it
+   also reverses the drift .lift has to cancel. */
 .flipper {
   position: absolute;
   inset: 0;
-  transform-origin: center bottom;
-  transform: rotateX(calc(var(--e) * -180deg));
+  transform-origin: center top;
+  transform: rotateX(calc(var(--e) * 180deg));
   transform-style: preserve-3d;
+}
+
+/* Hinted only while the follower is actually moving. Leaving will-change on a
+   viewport-sized element pins a compositor layer for the life of the page. */
+[data-turning='true'] .lift,
+[data-turning='true'] .flipper {
   will-change: transform;
 }
 
@@ -53,6 +62,24 @@
   pointer-events: none;
 }
 
+/* Light. A plane that turns without catching any is the tell that this is a
+   transform and not a card, so the sheen tracks the angle: nothing at rest,
+   strongest as the page goes edge-on and the light grazes it. */
+.face::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgb(255 255 255 / 0.38),
+    rgb(255 255 255 / 0.03) 42%,
+    rgb(0 0 0 / 0.04) 62%,
+    rgb(0 0 0 / 0.28)
+  );
+  opacity: calc(sin(var(--theta)) * 0.62);
+}
+
 .back {
   transform: rotateX(180deg);
 }
@@ -65,11 +92,20 @@
   .face {
     backface-visibility: visible;
   }
+  /* Reduced motion gets a cut, not a crossfade. Two things go wrong with a
+     fade here: independent ramps leave a hole where both faces reach zero and
+     the screen goes blank, and any overlap shows both faces superimposed.
+     So the front stays put and the reverse swaps in over it across ~30px of
+     scroll — fast enough to read as a cut, and the back face being later in
+     the DOM means it covers the front completely. */
   .front {
-    opacity: clamp(0, calc((0.45 - var(--p)) * 6), 1);
+    opacity: 1;
   }
   .back {
     transform: none;
-    opacity: clamp(0, calc((var(--p) - 0.45) * 6), 1);
+    opacity: clamp(0, calc((var(--p) - 0.47) * 25), 1);
+  }
+  .face::after {
+    opacity: 0;
   }
 }

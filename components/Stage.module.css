@@ -3,7 +3,7 @@
   --p: 0; /* raw scroll progress through the stage, 0 → 1 */
   --e: 0; /* eased turn progress, 0 → 1 */
   position: relative;
-  height: 280vh;
+  height: 180vh;
 }
 
 .sticky {
@@ -13,13 +13,33 @@
   overflow: hidden;
 }
 
+/* The card is set down rather than simply being there. Its own element, and
+   animating `translate` rather than `transform`, so it never competes with the
+   turn on .lift or the drawer push on .perspective. */
+.entrance {
+  position: absolute;
+  inset: 0;
+  animation: settle 760ms var(--ease-out) both;
+}
+
+@keyframes settle {
+  from {
+    opacity: 0;
+    translate: 0 -1.6%;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
 /* Perspective must live above the card so the 3D chain stays intact. Far
    enough back that a full-page plane tilting toward the viewer does not
    balloon past the frame. */
 .perspective {
   position: absolute;
   inset: 0;
-  perspective: 3000px;
+  perspective: 4200px;
   transition: transform var(--t-drawer) var(--ease-out),
     opacity var(--t-drawer) var(--ease-out);
 }
@@ -30,14 +50,15 @@
   opacity: 0.35;
 }
 
+/* Right edge, mid-height: the one part of the card that is always empty. */
 .hint {
   position: absolute;
   z-index: 2;
-  bottom: calc(var(--gutter-y) * 0.55);
-  left: 50%;
-  translate: -50% 0;
+  top: 50%;
+  right: var(--gutter-x);
+  translate: 0 -50%;
   display: grid;
-  justify-items: center;
+  justify-items: end;
   gap: 0.7rem;
   font-size: clamp(0.5rem, 0.72vw, 0.68rem);
   font-weight: 400;
@@ -55,13 +76,13 @@
 
 .hintRule {
   width: 1px;
-  height: 2.4rem;
+  height: clamp(2rem, 6vh, 3.5rem);
   background: linear-gradient(to bottom, transparent, var(--rule));
 }
 
 @media (max-width: 720px) {
   .stage {
-    height: 240vh;
+    height: 160vh;
   }
   .pushed {
     transform: translateX(-8vw) scale(0.7);
@@ -70,6 +91,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .entrance {
+    animation: none;
+  }
   .perspective {
     perspective: none;
     transition: opacity var(--t-drawer) var(--ease-out);
