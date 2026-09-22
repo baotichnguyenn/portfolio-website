@@ -6,9 +6,6 @@ page: the viewport itself is the stock, edge to edge, and the card face reproduc
 photo's grain, lettering and layout, measured rather than eyeballed. Restraint is the whole
 aesthetic. Every decision defaults to *less*.
 
-The reference is a straight-on photograph of the card, 987 × 627. Every number in §2 below came off
-it with a script; when this file says "the photo", that is what it means.
-
 ---
 
 ## 1. The concept
