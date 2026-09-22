@@ -1,5 +1,4 @@
 import { CardFront } from './CardFront';
-import { ProjectsGrid } from './ProjectsGrid';
 import styles from './BusinessCard.module.css';
 
 type Props = {
@@ -7,16 +6,15 @@ type Props = {
   inert: boolean;
 };
 
+/**
+ * One face. The card never turns far enough to show its reverse: the projects
+ * sheet covers it on the way up, so there is nothing printed on the back.
+ */
 export function BusinessCard({ onOpenCareers, inert }: Props) {
   return (
-    <div className={styles.lift}>
-      <div className={styles.flipper} inert={inert || undefined}>
-        <div className={`${styles.face} ${styles.front}`}>
-          <CardFront onOpenCareers={onOpenCareers} />
-        </div>
-        <div className={`${styles.face} ${styles.back}`}>
-          <ProjectsGrid onOpenCareers={onOpenCareers} />
-        </div>
+    <div className={styles.flipper} inert={inert || undefined}>
+      <div className={styles.face}>
+        <CardFront onOpenCareers={onOpenCareers} />
       </div>
     </div>
   );

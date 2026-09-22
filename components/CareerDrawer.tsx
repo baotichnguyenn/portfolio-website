@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { career, type CareerNode } from '@/lib/content';
+import { Figures } from './Figures';
 import styles from './CareerDrawer.module.css';
 
 const FOCUSABLE =
@@ -111,7 +112,9 @@ function Branch({
             {node.org}
             {node.location ? ` — ${node.location}` : ''}
           </p>
-          <p className={styles.period}>{node.period}</p>
+          <p className={styles.period}>
+            <Figures>{node.period}</Figures>
+          </p>
           {node.summary && <p className={styles.summary}>{node.summary}</p>}
           {node.highlights && node.highlights.length > 0 && (
             <ul className={styles.highlights}>

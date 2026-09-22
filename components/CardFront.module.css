@@ -1,129 +1,135 @@
-/* The card at page scale. Everything sits inside the trim, against the gutters. */
+/* The reference card, measured. Every position below is where that element's
+   cap-height centre sits on the photo, as a fraction of the card (987 × 627),
+   and every size is its cap height in card units (--u, 1% of the card's
+   width). Nothing here is by eye — see CLAUDE.md §2 "Layout" before moving
+   anything. With line-height 1, a Jost line box's centre is its cap centre,
+   which is why `translate: 0 -50%` puts each element exactly on its mark. */
 .front {
   position: absolute;
   inset: 0;
-  padding: var(--gutter-y) var(--gutter-x);
-  display: grid;
-  /* header · statement · careers · contact. The statement takes the slack,
-     which is what stops the middle of the page reading as unfinished. */
-  grid-template-rows: auto 1fr auto auto;
-  font-family: var(--serif);
   color: var(--ink);
-  text-transform: uppercase;
-  /* Letterpress: ink sits below the surface, the fibre above it catches light. */
-  text-shadow: 0 1px 0 rgb(255 255 255 / 0.35);
+  font-family: var(--type);
+  font-weight: 600;
+  line-height: 1;
+  text-shadow: var(--press);
 }
+
+.name,
+.title,
+.phone,
+.address {
+  position: absolute;
+  margin: 0;
+  translate: 0 -50%;
+}
+
+/* ---- centre: PAUL ALLEN / Vice President -------------------------------- */
 
 .name {
-  margin: 0;
-  font-size: clamp(2.1rem, 7.4vw, 7.5rem);
-  font-weight: 400;
-  letter-spacing: 0.2em;
-  line-height: 1.05;
-  /* Tracking adds a trailing gap after the last letter; pull it back so the
-     optical left and right margins match. */
-  margin-right: -0.2em;
+  top: 45.06%;
+  left: 0;
+  right: 0;
+  font-size: calc(4.35 * var(--u));
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  /* Tracking trails the last glyph; pad the left by the same so the lettering,
+     not the box, is what sits on the centre line. */
+  padding-left: 0.07em;
+  text-align: center;
+  text-transform: uppercase;
 }
 
+/* The one sentence-case line on the card, and the one regular weight. Placed
+   off the name in card units rather than as its own fraction of the height:
+   identical on a card-shaped screen (5.11u is the photo's 8.05%), and on a tall
+   phone the pair stays together instead of drifting apart. */
 .title {
-  margin: clamp(0.9rem, 2vh, 1.6rem) 0 0;
-  font-size: clamp(0.6rem, 1.15vw, 1.05rem);
+  top: calc(45.06% + 5.11 * var(--u));
+  left: 0;
+  right: 0;
+  font-size: calc(3.28 * var(--u));
   font-weight: 400;
-  letter-spacing: 0.5em;
-  color: var(--ink-soft);
-}
-
-/* The one sentence-case element on either face. Uppercase at this length is
-   unreadable, and the size sits between the name and the title so the
-   hierarchy has a middle step instead of falling off a cliff. */
-.statement {
-  margin: 0;
-  align-self: center;
-  /* Wide enough to land on 2–3 lines. A narrow measure looks considered on a
-     small card and looks like an unfinished column at page scale. */
-  max-width: min(44ch, 88%);
+  letter-spacing: 0;
+  text-align: center;
   text-transform: none;
-  font-size: clamp(1.05rem, 2.3vw, 2.1rem);
-  font-weight: 400;
-  line-height: 1.45;
-  letter-spacing: 0.015em;
-  color: var(--ink);
-  text-wrap: balance;
 }
 
-.org {
-  justify-self: start;
-  text-align: left;
+/* ---- top right: PIERCE & PIERCE / MERGERS AND ACQUISITIONS ------------ */
+
+.lockup {
+  position: absolute;
+  top: 13.24%;
+  right: 9.63%;
+  translate: 0 -0.5em;
   display: grid;
-  gap: clamp(0.4rem, 1vh, 0.7rem);
-  padding-bottom: clamp(1.2rem, 4vh, 2.6rem);
+  justify-items: end;
+  text-align: right;
+  /* The label's size, so the translate above centres the label line. */
+  font-size: calc(3.855 * var(--u));
+  font-weight: 600;
+  line-height: 1;
   /* Chrome's UA sheet sets text-transform: none on buttons; it is not inherited. */
   text-transform: uppercase;
-  min-height: 44px;
   transition: color var(--t-state) var(--ease-out);
 }
 
-.orgLabel {
-  font-size: clamp(0.95rem, 2vw, 1.85rem);
-  letter-spacing: 0.3em;
-  position: relative;
-  display: inline-block;
+/* Jost's capitals run wider than the reference's face at the same height,
+   so the lockup is tracked in slightly to hold the photo's measure. */
+.label {
+  display: block;
+  width: max-content;
+  letter-spacing: -0.014em;
+  margin-right: 0.014em;
 }
 
-/* The hairline that admits this line is a door. */
-.orgLabel::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0.3em;
-  bottom: -0.38em;
-  height: 1px;
-  background: var(--rule);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform var(--t-state) var(--ease-out), background var(--t-state);
+.amp {
+  font-size: 0.8em;
+  font-weight: 500;
 }
 
-.org:hover .orgLabel::after,
-.org:focus-visible .orgLabel::after {
-  transform: scaleX(1);
-  background: var(--accent);
+/* Spread by CardFront.tsx to run exactly the label's width. */
+.sub {
+  display: block;
+  width: max-content;
+  /* Puts the sub-line's cap centre 3.748u below the label's, as on the photo:
+     3.748 − 3.855/2 − 2.17/2. */
+  margin-top: calc(0.7355 * var(--u));
+  font-size: calc(2.17 * var(--u));
+  white-space: nowrap;
 }
 
-.org:hover,
-.org:focus-visible {
+.lockup:hover,
+.lockup:focus-visible {
   color: var(--accent);
 }
 
-.orgSub {
-  font-size: clamp(0.55rem, 0.95vw, 0.85rem);
-  letter-spacing: 0.36em;
-  color: var(--ink-soft);
+/* ---- top left: 212.555.6342 -------------------------------------------- */
+
+.phone {
+  top: 14.83%;
+  left: 8.71%;
+  font-size: calc(3.17 * var(--u));
+  letter-spacing: -0.015em;
 }
 
-.contact {
+/* ---- bottom: 358 EXCHANGE PLACE … / FAX … TELEX … ----------------------- */
+
+.address {
+  --leading: 1.488;
+  top: 78.95%;
+  left: 50%;
+  translate: -50% calc(-0.5 * var(--leading) * 1em);
+  width: max-content;
+  max-width: 88%;
+  font-size: calc(3.06 * var(--u));
   font-style: normal; /* <address> is italic by default */
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem clamp(1.2rem, 3.5vw, 3rem);
-  padding-top: clamp(0.9rem, 2.2vh, 1.6rem);
-  border-top: 1px solid var(--rule);
-  font-size: clamp(0.52rem, 0.82vw, 0.78rem);
-  letter-spacing: 0.26em;
-  color: var(--ink-soft);
+  line-height: var(--leading);
+  letter-spacing: -0.01em;
+  text-align: center;
+  text-transform: uppercase;
+  text-wrap: balance;
 }
 
-@media (max-width: 720px) {
-  .name {
-    letter-spacing: 0.14em;
-  }
-  .title {
-    letter-spacing: 0.34em;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .orgLabel::after {
-    transition: none;
-  }
+.line {
+  display: block;
 }

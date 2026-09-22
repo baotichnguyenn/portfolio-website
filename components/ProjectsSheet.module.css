@@ -1,0 +1,184 @@
+/* A second sheet of the same stock, pulled up over the card. */
+.sheet {
+  position: relative;
+  z-index: 1;
+  /* Starts one screen up, so it begins one --peek above the bottom of the
+     viewport and reaches the top exactly as the stage runs out (Stage.module.css). */
+  margin-top: -100dvh;
+  min-height: 100dvh;
+  padding: var(--gutter-y) var(--gutter-x) calc(var(--gutter-y) * 1.4);
+  background-color: var(--paper-base);
+  background-image: var(--grain);
+  background-size: var(--grain-size);
+  background-blend-mode: multiply;
+  color: var(--ink);
+  font-family: var(--type);
+  /* The pull itself is native scrolling, but the card turns on the damped
+     follower, which lags a fast scroll. Holding the sheet back by exactly that
+     lag keeps the two locked together; at rest --e has caught --p and this is
+     zero, so the sheet is simply where the document puts it. */
+  translate: 0 calc((var(--p) - var(--e)) * (100dvh - var(--peek)));
+  /* At rest, only what a sheet lying against the card would show: a hairline
+     where its top edge catches the light and a tight contact shadow. The card
+     face above stays clean, as the reference is. */
+  box-shadow:
+    0 -1px 0 rgb(255 255 255 / 0.35),
+    0 -3px 8px -3px rgb(0 0 0 / 0.25);
+}
+
+/* The shadow the sheet casts up onto the card, which deepens as the sheet
+   comes away from it. Opacity on its own layer rather than an animated
+   box-shadow, so pulling repaints nothing. */
+.sheet::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  height: clamp(40px, 9vh, 96px);
+  background: linear-gradient(to top, rgb(0 0 0 / 0.45), transparent);
+  opacity: min(1, calc(var(--e) * 3));
+  pointer-events: none;
+}
+
+/* ---- head ---------------------------------------------------------------- */
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding-bottom: clamp(0.9rem, 2.4vh, 1.6rem);
+  border-bottom: 1px solid var(--rule);
+  font-weight: 600;
+  text-transform: uppercase;
+  text-shadow: var(--press);
+}
+
+.heading {
+  margin: 0;
+  font-size: clamp(1.6rem, calc(4 * var(--u)), 3.6rem);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+
+.count {
+  margin-left: 0.7em;
+  font-size: 0.42em;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  vertical-align: 0.35em;
+}
+
+.careersLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: clamp(0.8rem, calc(1.6 * var(--u)), 1.15rem);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  /* Buttons do not inherit text-transform. */
+  text-transform: uppercase;
+  transition: color var(--t-state) var(--ease-out);
+}
+
+.careersLink:hover,
+.careersLink:focus-visible {
+  color: var(--accent);
+}
+
+/* ---- grid: three to a row ------------------------------------------------ */
+
+.grid {
+  list-style: none;
+  margin: clamp(1.75rem, 6vh, 4rem) 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: clamp(1.25rem, 3.5vw, 3.5rem);
+  row-gap: clamp(2.25rem, 7vh, 4.5rem);
+}
+
+/* Each entry is ruled across its top, like a line in a printed catalogue,
+   rather than boxed — boxes are what make a grid of work look like a web page. */
+.tile {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: clamp(0.55rem, 1.4vh, 0.9rem);
+  padding-top: clamp(0.8rem, 2vh, 1.2rem);
+  border-top: 1px solid var(--rule);
+}
+
+.meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: clamp(0.7rem, calc(1.15 * var(--u)), 0.9rem);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(1.3rem, calc(2.6 * var(--u)), 2.3rem);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  text-shadow: var(--press);
+  transition: color var(--t-state) var(--ease-out);
+}
+
+.title a {
+  text-decoration: none;
+}
+
+/* Whole tile is the target; the link keeps the accessible name. */
+.title a::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.tile:hover .title {
+  color: var(--accent);
+}
+
+.blurb {
+  margin: 0;
+  max-width: 34ch;
+  font-size: clamp(0.98rem, calc(1.4 * var(--u)), 1.2rem);
+  font-weight: 400;
+  line-height: 1.55;
+}
+
+.stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35em 0.9em;
+  margin: 0;
+  font-size: clamp(0.7rem, calc(1.15 * var(--u)), 0.9rem);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Reduced motion: the follower is bypassed, so --e equals --p and the offset
+   above is already zero. Nothing to override — the sheet is plain scrolling. */

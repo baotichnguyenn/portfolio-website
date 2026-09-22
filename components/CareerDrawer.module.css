@@ -20,8 +20,14 @@
   z-index: 50;
   width: min(560px, 92vw);
   height: 100dvh;
-  background: var(--paper);
+  /* The same stock as the card and the projects sheet. */
+  background-color: var(--paper-base);
+  background-image: var(--grain);
+  background-size: var(--grain-size);
+  background-blend-mode: multiply;
   border-left: 1px solid var(--paper-edge);
+  color: var(--ink);
+  font-family: var(--type);
   box-shadow: -40px 0 80px -30px rgba(0, 0, 0, 0.8);
   transform: translateX(100%);
   transition: transform var(--t-drawer) var(--ease-out),
@@ -45,22 +51,26 @@
   gap: 1rem;
   padding: 2rem 2rem 1.2rem;
   border-bottom: 1px solid var(--rule);
-  font-family: var(--serif);
+  font-weight: 600;
   text-transform: uppercase;
+  text-shadow: var(--press);
 }
 
 .title {
   margin: 0;
-  font-size: 1rem;
-  font-weight: 400;
-  letter-spacing: 0.34em;
+  font-size: 1.35rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.03em;
   color: var(--ink);
 }
 
 .close {
-  font-family: var(--sans);
-  font-size: 0.62rem;
-  letter-spacing: 0.24em;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  /* Buttons do not inherit text-transform. */
+  text-transform: uppercase;
   color: var(--ink-soft);
   min-height: 44px;
   min-width: 44px;
@@ -113,12 +123,13 @@
   transform: translateY(0);
 }
 
-/* Trunk: a rule down the left of every node, stopping at the last one. */
+/* Trunk: a rule down the left of every node, stopping at the last one. The
+   0.62rem is the role line's cap centre, so each elbow meets its role mid-letter. */
 .node::before {
   content: '';
   position: absolute;
   left: 0;
-  top: 0.45rem;
+  top: 0.62rem;
   bottom: -1.4rem;
   border-left: 1px solid var(--rule);
 }
@@ -137,7 +148,7 @@
   content: '';
   position: absolute;
   left: 0;
-  top: 0.45rem;
+  top: 0.62rem;
   width: 0.95rem;
   border-top: 1px solid var(--rule);
 }
@@ -148,36 +159,39 @@
 
 .role {
   margin: 0;
-  font-family: var(--serif);
-  font-size: 0.95rem;
-  font-weight: 500;
-  letter-spacing: 0.18em;
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
+  text-shadow: var(--press);
   color: var(--ink);
 }
 
 .org {
-  margin: 0.35rem 0 0;
-  font-size: 0.7rem;
-  font-weight: 400;
-  letter-spacing: 0.1em;
+  margin: 0.4rem 0 0;
+  font-size: 0.92rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
   color: var(--accent);
 }
 
+/* Weight 500, not the 300 this once asked for: only 400/500/600 are loaded,
+   and an unloaded weight is silently faked by the browser. */
 .period {
   margin: 0.3rem 0 0;
-  font-size: 0.6rem;
-  font-weight: 300;
-  letter-spacing: 0.2em;
+  font-size: 0.74rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ink-soft);
 }
 
 .summary {
-  margin: 0.7rem 0 0;
-  font-size: 0.78rem;
+  margin: 0.75rem 0 0;
+  font-size: 0.95rem;
   font-weight: 400;
-  line-height: 1.65;
+  line-height: 1.6;
   color: var(--ink);
 }
 
@@ -192,9 +206,9 @@
 .highlights li {
   position: relative;
   padding-left: 1rem;
-  font-size: 0.74rem;
+  font-size: 0.9rem;
   font-weight: 400;
-  line-height: 1.6;
+  line-height: 1.55;
   color: var(--ink-soft);
 }
 
@@ -202,7 +216,7 @@
   content: '';
   position: absolute;
   left: 0;
-  top: 0.6rem;
+  top: 0.72rem;
   width: 0.45rem;
   height: 1px;
   background: var(--rule);

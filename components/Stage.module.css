@@ -1,9 +1,18 @@
-/* The scroll runway. Its height is what the turn is spent over. */
-.stage {
-  --p: 0; /* raw scroll progress through the stage, 0 → 1 */
-  --e: 0; /* eased turn progress, 0 → 1 */
+/* --p and --e live on the scene, not the stage, because the projects sheet —
+   a sibling of the stage — reads them too. */
+.scene {
+  --p: 0; /* how far the sheet has been pulled, raw, 0 → 1 */
+  --e: 0; /* the damped follower of --p; the card turns on this */
   position: relative;
-  height: 180vh;
+}
+
+/* Two screens tall, less the peek: the first screen is the card at rest, the
+   second is the pull. The sheet follows immediately in the document with a
+   -100dvh margin, so its top starts one --peek above the bottom of the
+   viewport and reaches the top exactly as the stage runs out. */
+.stage {
+  position: relative;
+  height: calc(200dvh - var(--peek));
 }
 
 .sticky {
@@ -14,8 +23,8 @@
 }
 
 /* The card is set down rather than simply being there. Its own element, and
-   animating `translate` rather than `transform`, so it never competes with the
-   turn on .lift or the drawer push on .perspective. */
+   `translate` rather than `transform`, so it never competes with the turn on
+   .flipper or the drawer push on .perspective. */
 .entrance {
   position: absolute;
   inset: 0;
@@ -33,13 +42,25 @@
   }
 }
 
-/* Perspective must live above the card so the 3D chain stays intact. Far
-   enough back that a full-page plane tilting toward the viewer does not
-   balloon past the frame. */
+/* Perspective must live above the card, on its parent, for the tip to
+   foreshorten. 4200px is tuned against --turn: see BusinessCard.module.css.
+
+   The card recedes as the sheet comes up over it — out of focus and into
+   shade — which is what makes the sheet read as the thing in front. The
+   filter goes here, on the parent, because a filter flattens 3D on the
+   element it sits on; here it blurs the already-projected card.
+
+   A blur also samples past the card's edges, which would ring the frame with
+   the void. `scale` grows the layer a little faster than the blur spreads
+   (6% of the frame against 14px), so those soft edges stay off screen. It is
+   the independent property, not `transform`, so the drawer's push can still
+   own `transform`. */
 .perspective {
   position: absolute;
   inset: 0;
   perspective: 4200px;
+  filter: blur(calc(var(--e) * 14px)) brightness(calc(1 - var(--e) * 0.35));
+  scale: calc(1 + var(--e) * 0.06);
   transition: transform var(--t-drawer) var(--ease-out),
     opacity var(--t-drawer) var(--ease-out);
 }
@@ -50,40 +71,7 @@
   opacity: 0.35;
 }
 
-/* Right edge, mid-height: the one part of the card that is always empty. */
-.hint {
-  position: absolute;
-  z-index: 2;
-  top: 50%;
-  right: var(--gutter-x);
-  translate: 0 -50%;
-  display: grid;
-  justify-items: end;
-  gap: 0.7rem;
-  font-size: clamp(0.5rem, 0.72vw, 0.68rem);
-  font-weight: 400;
-  letter-spacing: 0.34em;
-  text-transform: uppercase;
-  color: var(--ink-soft);
-  opacity: clamp(0, calc((0.1 - var(--p)) * 10), 1);
-  pointer-events: none;
-  transition: opacity var(--t-state) var(--ease-out);
-}
-
-.hintHidden {
-  opacity: 0;
-}
-
-.hintRule {
-  width: 1px;
-  height: clamp(2rem, 6vh, 3.5rem);
-  background: linear-gradient(to bottom, transparent, var(--rule));
-}
-
 @media (max-width: 720px) {
-  .stage {
-    height: 160vh;
-  }
   .pushed {
     transform: translateX(-8vw) scale(0.7);
     opacity: 0.2;
@@ -94,8 +82,12 @@
   .entrance {
     animation: none;
   }
+  /* No tip, no growth; the card only dims under the sheet. Without the scale
+     a blur would show its edges, so it goes too. */
   .perspective {
     perspective: none;
+    filter: brightness(calc(1 - var(--e) * 0.35));
+    scale: none;
     transition: opacity var(--t-drawer) var(--ease-out);
   }
   .pushed {
