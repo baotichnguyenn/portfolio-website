@@ -1,143 +1,202 @@
 # CLAUDE.md — Portfolio Website
 
-Personal portfolio built around one conceit: **the page is a business card**, in the register of the
-American Psycho card scene (Paul Allen, Pierce & Pierce). Not a card sitting on a page — the viewport
-itself is the stock, edge to edge. Restraint is the whole aesthetic. Every decision defaults to *less*.
+Personal portfolio built around one conceit: **the page is a business card** — specifically Paul
+Allen's, from *American Psycho* (Pierce & Pierce, Mergers and Acquisitions). Not a card sitting on a
+page: the viewport itself is the stock, edge to edge, and the card face reproduces the reference
+photo's grain, lettering and layout, measured rather than eyeballed. Restraint is the whole
+aesthetic. Every decision defaults to *less*.
+
+The reference is a straight-on photograph of the card, 987 × 627. Every number in §2 below came off
+it with a script; when this file says "the photo", that is what it means.
 
 ---
 
 ## 1. The concept
 
-Three states, one object. The card is never replaced — it turns over.
+Two sheets of the same stock, and a drawer.
 
 | State | Trigger | What happens |
 |---|---|---|
-| **FRONT** | page load, scroll top | The card fills the viewport: name, title, `CAREERS` where "Pierce & Pierce" sits, contact strip along the bottom. |
-| **BACK** | scroll down | The page hinges on its **top edge** — the bottom edge lifts toward you and sweeps up and over, clockwise seen from the card's right. It recedes into the void, turns 180° and settles back to full bleed. Its reverse is **Projects** — a 3-per-row grid. |
-| **CAREERS** | click `CAREERS` (on either face) | The page slides left and recedes; a drawer enters from the right with work history drawn as a **tree**. |
+| **CARD** | page load, scroll top | The card fills the viewport, laid out as the reference: phone top left, `CAREERS` where "Pierce & Pierce" sits, name and title centred, two address lines along the bottom. A hairline of the projects sheet shows along the bottom edge. |
+| **PULL** | scroll down | The projects sheet is pulled up from the bottom edge. In step with it the card tips about its top edge — its bottom edge lifting up and toward you, clockwise seen from the card's right — blurring and dimming until the sheet has covered it. |
+| **PROJECTS** | pull complete | The sheet is now an ordinary page, three projects to a row, and scrolls on for as long as it is. |
+| **CAREERS** | click `CAREERS` (on the card, or on the sheet) | The card slides left and recedes; a drawer enters from the right with work history drawn as a **tree**. |
 
-There is no navigation, no router, no scroll-jacking beyond the single sticky stage.
+There is no navigation, no router, and no scroll-jacking: the pull is native scrolling.
 
 ---
 
 ## 2. Design language
 
 ### Material
-The page is **paper**, not a background colour. Two things carry that: the grain on `.face`, and the
-**trim** — a hairline inset `--trim` from the viewport edge. Without the trim a full-bleed page reads
-as a colour; with it, it reads as stock. Depth appears only when the page lifts off during the turn:
-a long, low-opacity shadow, a 1px edge, and the **sheen** — a top-lit gradient on `.face::after`
-whose opacity tracks `sin θ`, so the surface is flat at rest and catches light most as it goes
-edge-on. That sheen is doing most of the work of making the turn read as a physical object; a plane
-that rotates without shading is the clearest tell that something is a CSS transform. Never a glow,
-a gradient fill for its own sake, or a border-radius above 2px.
+The page is **cotton stock**, and the grain is what says so. `public/paper/grain.png` is generated,
+not drawn: `scripts/generate-paper.mjs` (`npm run paper`) builds tileable multi-octave noise and
+solves for the octave amplitudes that reproduce the photo's grain — its luminance sd after box blurs
+of 1, 3, 5, 9, 17 and 33px (14.8 → 1.6), its long dark tail (p2 −34, p98 +27), and its extremes
+(p0.1 −53, p99.9 +37). Rendered, the paper matches the photo on every one of those within two levels.
+
+The tile is **multiplied** over `--paper-base` (`background-blend-mode: multiply`). Multiply keeps
+the grain proportional to the paper under it, and it only darkens — which is why `--paper-base` is
+`--paper ÷ 0.85`: the light specks need that headroom. The tile's texels map to photo pixels, so it
+is sized in card units (`--grain-size`), floored at 1:1 so it never goes sub-pixel on a phone.
+
+**Letterpress** is `--press`: the ink sits below the surface, so the lower lip of each stroke catches
+light and the upper lip sits in shadow. In `em`, so it scales with the lettering.
+
+There is **no trim line and no border** on the card: the reference has none, and the grain carries
+the "this is paper" job on its own. Depth appears only in motion — the card's blur and shade as it
+tips, the sheen on its face, the shadow the projects sheet casts up onto it. Never a glow, a gradient
+fill for its own sake, or a border-radius above 2px.
 
 ### Colour
-All colour lives in `app/globals.css` as tokens. Never hard-code a hex in a component.
+All colour lives in `app/globals.css` as tokens. Never hard-code a hex in a component. The stock and
+ink are the photo's, measured.
 
 ```
---paper        #EDE8DB   the page (bone)
---paper-edge   #E2DBC9   the 1px edge that appears when the page lifts
---ink          #26241F   text (never #000 — ink soaks into fibre)
---ink-soft     #6B665A   secondary text, dates, captions
---rule         #C3BBA7   hairlines, the trim
---field        #0D0D09   the void the card turns over in
---accent       #6E2A24   oxblood. One use per screen, maximum.
+--paper        #D3CAC6   the stock's mean — the photo's blank paper, exactly
+--paper-base   #F8EEE9   --paper ÷ 0.85: what the grain is multiplied over
+--paper-edge   #B9B0AC   the cut edge, seen only when the drawer pushes the card aside
+--ink          #332A2D   the photo's ink — a charcoal with an aubergine cast. 8.6:1
+--ink-soft     #564B4E   captions, dates, stacks. 5.2:1
+--rule         #9B918D   hairlines
+--field        #0F0C0D   the void; seen only around the pushed card
+--accent       #6E2A24   oxblood, 6.5:1. Hover, focus, and the org names in the drawer.
+                         Never on the card face at rest — the reference is one ink.
 ```
 
-**Dark mode inverts the stock**, not just the field: dark paper, light ink, `--accent` lifted to
-`#C06C64` to hold contrast. This is the one place the design departs from the film — a full screen of
-bone at night is not restraint, it is a torch. Every token is redefined under
-`@media (prefers-color-scheme: dark)` and again under `:root[data-theme='dark']`.
+**One palette in both colour schemes.** `color-scheme: light`, no dark variant. The card is the
+card; the reference stock is already a mid-light warm grey (≈80% luminance), not bright bone, and
+every dimmed version tried cost the ink contrast (8.6 → ~5) and the accent its AA margin. If a dark
+mode is ever wanted, it is a new design decision, not a token swap — revisit this paragraph first.
 
 ### Type
-Two families, no more.
+**One family: Jost** (400, 500, 600 — nothing else is loaded, and an unloaded weight is silently
+faked by the browser). The reference is set in a geometric sans; Jost is the nearest open match, and
+the fallback stack names the paid originals (Futura PT, Futura).
 
-- **Serif — `EB Garamond`** → the card faces. Everything uppercase, `letter-spacing` between
-  `.14em` and `.5em`. Tracking *is* the design; when something looks wrong, it is almost always
-  tracking, not size.
-  - **One exception: `.statement`**, the sentence in the middle of the front. Sentence case, near-zero
-    tracking, sized between the name and the title. It is there because the hierarchy otherwise falls
-    from 106px straight to 14px with nothing between, which is most of why the page read as
-    unfinished — and because uppercase at sentence length is unreadable. Keep it the only one.
-- **Sans — `Inter`** → tile blurbs and the career drawer — content rather than card.
+- **Capitals, weight 600**, for everything on the card except the title. Tracking is tight, per the
+  photo — between −0.015em and +0.07em, fitted per line (below), not a house value.
+- **The title is the one sentence-case, regular-weight line on the card** ("Vice President").
+- **Figures print at 0.86 of the capitals** in running lines — "358 EXCHANGE PLACE", "FAX 212…" —
+  measured on the photo (19px figures against 22px capitals). `components/Figures.tsx` does it; use
+  it anywhere digits sit among capitals (the drawer's periods, the sheet's years and count do).
+- **An ampersand prints at 0.8** ("PIERCE & PIERCE"). `CardFront.tsx` handles it in the label.
+- Off the card — sheet and drawer — the same family, capitals at 600 for headings and labels,
+  sentence case at 400 for anything you read. Never italic. Never above 600.
 
-Every size is a `clamp()` against `vw`, because the card is the viewport and has to hold its
-proportions from a phone to a 32" display. Never use font-weight above 500. Never use italic.
+### Layout (the card face)
+**Every position on the card is the photo's**, as a fraction of the card, and **every size is the
+photo's cap height** in card units: `--u` is 1% of the card's width, where the card is the viewport
+but never wider than the photo's 1.574 aspect allows for its height. With `line-height: 1`, a Jost
+line box's centre is its cap centre, so each element is placed with `top: <centre>%` and
+`translate: 0 -50%`.
+
+| Element | Cap centre (y) | Horizontal | Cap height → font-size | Tracking |
+|---|---|---|---|---|
+| phone | 14.83% | left 8.71% | 3.17u | −0.015em |
+| label (`CAREERS`) | 13.24% | right 9.63% | 3.855u | −0.014em |
+| sub-line | label + 3.748u | right-aligned | 2.17u | fitted (below) |
+| name | 45.06% | centred | 4.35u | 0.07em |
+| title | name + 5.11u | centred | 3.28u (400, sentence case) | 0 |
+| address | 78.95%, then 1.488 leading | centred | 3.06u | −0.01em |
+
+These were calibrated by rendering the photo's exact text on the site at 987 × 627 and measuring
+both images with the same script: every element lands within 0–2px of the photo in position, width
+and cap height. **Do not nudge them by eye** — if something looks off, re-measure. Jost's capitals
+run 8–11% wider than the reference face at the same height, which is what the negative tracking is
+buying back.
+
+**The lockup is justified.** On the photo "MERGERS AND ACQUISITIONS" runs exactly the width of
+"PIERCE & PIERCE" (289px each). CSS cannot fit tracking to a width, so `CardFront.tsx` measures the
+label's glyphs and spreads the sub-line to match, re-fitting on resize and when the webfont lands.
+Any label and sub-line text works.
+
+On a portrait phone `--u` becomes `1.35vw` — the card cannot keep the photo's proportions and stay
+legible — and the address lines may wrap (`text-wrap: balance`). The title is placed off the name in
+`u` precisely so the pair stays together on a tall screen.
 
 ### Spacing
-The card's margins are the page's margins: `--gutter-x` and `--gutter-y`, both fluid. Both faces use
-the same pair, so the front and the reverse feel printed on one sheet.
+Off the card, `--gutter-x` / `--gutter-y` echo the card's ~9% margins, so the sheet and drawer feel
+printed on the same stationery.
 
 ---
 
 ## 3. Motion
 
-Motion is mechanical, not playful. Things are *hinged*, *slid*, or *revealed* — never bounced.
+Motion is mechanical, not playful. Things are *pulled*, *tipped*, *slid* — never bounced.
 
-- **Easing**: `cubic-bezier(.22,.61,.36,1)` for entrances, a cubic in-out for the turn. No spring
-  overshoot anywhere.
-- **Durations**: 180ms (hover/state), 420ms (drawer), scroll-driven (the turn — the user owns the clock).
-- **Only `transform` and `opacity` animate.** Never width, height, top, or left.
-- **`prefers-reduced-motion: reduce` is a first-class path**, not a fallback: the turn becomes a
-  **cut** — the reverse swaps in over the front at half scroll — and the drawer becomes a fade. Not a
-  cross-fade: fading both faces leaves a hole where the two ramps meet and the screen goes blank, and
-  any overlap shows both faces at once. **Screenshot this mode too.** It is the one path no amount of
-  scrolling in a normal browser will reveal.
+- **Easing**: `cubic-bezier(.22,.61,.36,1)` for entrances and the drawer. The pull is linear —
+  see below. No spring overshoot anywhere.
+- **Durations**: 180ms (hover/state), 420ms (drawer), 760ms (entrance), scroll-driven (the pull —
+  the reader owns the clock).
+- **Only `transform`, `translate`, `scale`, `opacity` and `filter` change per frame.** Never width,
+  height, top, left, or `box-shadow` — the sheet's cast shadow is an opacity-driven pseudo-element
+  precisely so pulling repaints nothing.
+- **`prefers-reduced-motion: reduce` is a first-class path**: the card does not tip or grow, and the
+  sheet simply scrolls up over it — which is ordinary scrolling, not an animation, so there is nothing
+  to cut or cross-fade. The card still dims beneath it. The entrance and the drawer slide are off.
+  **Screenshot this mode.** No amount of scrolling in a normal browser will show it to you.
 
-Scroll progress comes from a tall `.stage` with a `position: sticky` inner. `Stage.tsx` publishes two
-custom properties on it — `--p` (raw scroll through the stage) and `--e` (turn progress) — and
-**nothing else.** Every rotation, scale and opacity downstream is a `calc()` off those two numbers;
-JS never touches a transform.
+### The scroll mechanism
+The stage is `200dvh − --peek` tall and pins the card for exactly one screen of scrolling. The
+projects sheet is the next section in the document, pulled up by a `−100dvh` margin, so it starts
+one `--peek` above the bottom of the viewport and reaches the top exactly as the stage runs out.
+**The pull is native scrolling**: under the reader's hand, compositor-smooth, and the sheet carries
+on as an ordinary page afterwards, holding any number of projects.
 
-**`--e` is damped, not bound.** Scroll position is the *target*; `--e` chases it with a frame-rate
-independent exponential follower (`CHASE` in `Stage.tsx`). This is the single biggest difference
-between motion that feels driven and motion that feels dragged: a wheel arrives in discrete ~100px
-notches, and binding rotation straight to scroll makes the card jump a chunk of angle per notch, at
-whatever noisy velocity the input device happens to have. Never reintroduce a CSS `transition` on a
-value the follower already smooths — the two lags fight and read as a pop. The loop stops itself
-once settled, which is also what lets `will-change` be scoped to `[data-turning='true']` instead of
-pinning a compositor layer for a viewport-sized element for the life of the page.
+`Stage.tsx` is the only scroll listener. It publishes two numbers on the `.scene` wrapper — `--p`,
+how far the sheet has been pulled (raw, linear), and `--e`, a damped follower of it — and **nothing
+else**. Every angle, blur, scale and offset is a `calc()` off those two.
 
-Timeline: `0–.08` hold · `.08–.88` turn · `.88–1` settle. The reverse's content fades in only past
-`--e` 0.52, once the page is coming back toward the viewer.
+**`--e` is damped, not bound.** A wheel arrives in discrete notches, and binding the tip straight to
+scroll makes the card jump a chunk of angle per notch. `--e` chases `--p` with a frame-rate
+independent exponential follower (`CHASE`), and the loop stops itself once settled — which is what
+lets `will-change` be scoped to `[data-turning='true']` rather than pinning a viewport-sized layer
+for the life of the page.
 
-**The entrance** is a one-shot `settle` keyframe on `.entrance` — the page fades up from 1.6% above,
-as if set down. It gets its own element and animates `translate` rather than `transform`, so it never
-competes with the turn on `.lift` or the drawer push on `.perspective`. Two elements writing the same
-property is how this kind of thing breaks silently.
+**The sheet and the card move as one.** The card tips on `--e`, which lags a fast scroll, but the
+sheet is native and would not. So the sheet is held back by exactly the lag —
+`translate: 0 calc((--p − --e) × runway)` — which is zero at rest. Measured after a single hard jump
+of the scroll position, the sheet sits within 0.4px of where the card's angle puts it on every
+frame. **Never put a CSS `transition` on anything driven by `--e`**: two lags fight, and read as a pop.
+
+The pull is **linear** in scroll, deliberately. It is under the reader's hand, and a pull that eases
+in feels like it is resisting. The follower is the smoothing.
+
+**The entrance** is a one-shot `settle` keyframe on `.entrance` — the card fades up from 1.6% above,
+as if set down. It gets its own element and animates `translate`, not `transform`, so it never
+competes with the tip on `.flipper` or the drawer push on `.perspective`. Two elements writing the
+same property is how this kind of thing breaks silently.
 
 ---
 
-## 4. The turn (read before touching card CSS)
+## 4. The pull (read before touching the card's transforms)
 
-A full-page plane rotating toward the viewer is the whole trick, and it has two problems the CSS
-solves explicitly. Both live in `BusinessCard.module.css`.
+The card tips about its **top** edge while the sheet comes up from below, and the one thing that
+must never happen is the void showing between them. The geometry that guarantees it:
 
-**It drifts.** Rotating a rectangle 180° about its top edge lands it one full height *above* where it
-started. The centre of a plane hinged on its top edge rises by `h/2·(1−cos θ)`, so `.lift` translates
-down by exactly that, holding the page in the middle of the frame so it turns in place instead of
-climbing out of view. **The sign of the rotation and the sign of this correction are a pair** —
-reverse the turn and you must reverse the lift with it, or the page walks off screen.
+- The hinge is pinned to the top of the frame, so the card always covers from `y = 0` down to its
+  (projected) lower edge — and since everything below the hinge tips *toward* the viewer, the card is
+  never narrower than the frame either.
+- The sheet always covers from its own top edge down.
+- So there is no void as long as the card's projected lower edge stays below the sheet's top edge.
+  Tipping lifts that edge; perspective magnifies it past the frame. At `perspective: 4200px` it
+  holds for any tip up to about 80° — hence **`--turn: 80deg`**: the card has tipped that far by
+  the time the sheet has covered it, and never goes edge-on.
 
-**It over-runs the frame.** Tilt a viewport-sized plane toward a viewer and perspective makes its near
-edge wider than the viewport, and `.sticky`'s `overflow: hidden` clips the corners. Two things buy
-that back: a long perspective (4200px) and a recede, `--k = 1 − --turn-dip · sin θ`, peaking at
-edge-on and returning to 1.
+The card is therefore **never re-centred and never turns over** — both were earlier designs. A full
+180° turn in place goes edge-on at the midpoint and spends half the pull on a strip of card over a
+black void. There is **no reverse face**; nothing would ever show it.
 
-At the current perspective the plane is contained on its own, so **`--turn-dip` is now for weight,
-not containment** — just enough to read as a sheet lifting off. Resist raising it. A big dip shrinks
-the page into a flip-card widget and spends the middle of the animation on a small rectangle in a
-black void, which is the opposite of grand. Let the sheen convey the rotation instead.
+**The blur and its overscan.** The card recedes as the sheet covers it — `blur()` and `brightness()`
+on `.perspective`, the card's parent, because a filter flattens 3D on the element it sits on. A blur
+also samples past the card's edges, which would ring the frame with the void; `scale` grows the layer
+6% over the pull, faster than the 14px blur spreads, so those soft edges stay off screen. It is the
+independent `scale` property, so the drawer push still owns `transform`.
 
-Two elements, because the two transforms need different origins: **`.lift`** dips and re-centres
-about the middle, **`.flipper`** hinges on the top edge and rotates `+180deg` (a negative rotation
-would bring the *top* edge toward the viewer instead — the opposite turn). `.perspective` sits above both so the 3D
-chain stays intact; its distance (3400px) is tuned against `--turn-dip`. **Change one and you must
-re-check the other** — screenshot the midpoint (`--e ≈ 0.4`) and confirm all four edges are inside
-the frame.
-
-Faces use `backface-visibility: hidden`; the back face is pre-rotated `rotateX(180deg)` to read upright.
+**`--turn`, the 4200px perspective, the 14px blur and the 6% overscan are one tuned set.** Change any
+of them and re-run the void check (§7) — screenshots at a handful of angles will not catch a sliver
+that only opens at 92% on one aspect ratio.
 
 ---
 
@@ -145,22 +204,27 @@ Faces use `backface-visibility: hidden`; the back face is pre-rotated `rotateX(1
 
 ```
 app/
-  layout.tsx        fonts, metadata, <html> shell
-  page.tsx          composes Stage + CareerDrawer, owns `careersOpen`
-  globals.css       tokens, reset, base type
+  layout.tsx          fonts (Jost 400/500/600), metadata, <html> shell
+  page.tsx            composes Stage + CareerDrawer, owns `careersOpen`
+  globals.css         tokens, card unit, grain, reset
 components/
-  Stage.tsx         scroll → --p / --e. The only scroll listener in the app.
-  BusinessCard.tsx  the 3D chain: .lift > .flipper > two faces
-  CardFront.tsx     name / title / CAREERS slot / contact strip
-  ProjectsGrid.tsx  the reverse: heading + 3-per-row tiles
-  CareerDrawer.tsx  right-hand drawer, focus trap, tree renderer
+  Stage.tsx           the scene: pinned card + projects sheet. The only scroll listener.
+  BusinessCard.tsx    the tipping plane: .flipper > .face > CardFront
+  CardFront.tsx       the reference layout; fits the lockup's sub-line to the label
+  ProjectsSheet.tsx   the second sheet: pulled up, then an ordinary page, 3 to a row
+  CareerDrawer.tsx    right-hand drawer, focus trap, tree renderer
+  Figures.tsx         digits among capitals print at 0.86
 lib/
-  content.ts        ALL copy and data. The only file a content edit touches.
+  content.ts          ALL copy and data. The only file a content edit touches.
+scripts/
+  generate-paper.mjs  fits and writes public/paper/grain.png (`npm run paper`)
+public/paper/
+  grain.png           generated — do not edit by hand
 ```
 
 Rules:
 
-- **Components hold no content.** Name, projects, jobs, contact — all of it in `lib/content.ts`.
+- **Components hold no content.** Name, phone, address, projects, jobs — all in `lib/content.ts`.
 - One CSS Module per component (`Foo.module.css`), tokens from `globals.css`. No CSS-in-JS, no Tailwind.
 - Client components are marked `'use client'` and kept as few as possible.
 - No state library. `careersOpen` is `useState` in `page.tsx`; scroll progress is a CSS variable.
@@ -168,17 +232,22 @@ Rules:
 ### Content model
 
 ```ts
-Identity    { name, title, statement, careersLabel, careersSub, contact[] }
+Identity    { phone, careersLabel, careersSub, name, title, address: [string, string] }
 Project     { id, title, kind, year, blurb, stack[], href? }
 CareerNode  { id, role, org, period, location?, summary?, highlights[], children?: CareerNode[] }
 ```
 
+`Identity` maps one-to-one onto the reference card: `phone` is "212.555.6342", `careersLabel` /
+`careersSub` are "PIERCE & PIERCE" / "MERGERS AND ACQUISITIONS", `name` / `title` are "PAUL ALLEN" /
+"Vice President", and `address` is the two bottom lines. Keep the address lines roughly the photo's
+lengths (about 38 and 30 characters) — the layout will hold longer, but the card stops looking like
+the card.
+
 The career tree renders recursively — `children` are nested engagements/teams, drawn with CSS elbow
 connectors off a single trunk rule. Depth beyond 2 is allowed but discouraged.
 
-**The projects grid holds 6 (2 rows × 3).** The rows stretch to fill the page, which is what keeps
-each tile's meta line and stack locked to the top and bottom rules across a row. Add a 7th and the
-row heights collapse; prefer curating down to 6.
+**Projects are three to a row**, and the sheet scrolls, so there is no cap — but prefer multiples of
+three; a row that ends short reads as unfinished.
 
 ---
 
@@ -186,17 +255,17 @@ row heights collapse; prefer curating down to 6.
 
 Non-negotiable, because the whole site is one animated object:
 
-- Both faces' content exists in the DOM at all times and is readable with CSS disabled. The turn is
-  presentation; it never gates content from assistive tech.
-- `CAREERS` is a `<button>`, on both faces. The drawer is `role="dialog" aria-modal="true"`, traps
-  focus, closes on `Escape` and backdrop click, and returns focus to the button.
-- The card is `inert` while the drawer is open, so focus cannot wander behind it.
+- All content is in the DOM at all times and readable with CSS disabled. The tip and blur are
+  presentation; they never gate content from assistive tech.
+- `CAREERS` is a `<button>`, on the card and on the sheet. The drawer is `role="dialog"
+  aria-modal="true"`, traps focus, closes on `Escape` and backdrop click, and returns focus to the
+  button that opened it.
+- The card and the sheet are `inert` while the drawer is open, so focus cannot wander behind it.
 - Body scroll locks while the drawer is open.
 - Every interactive element has a visible `:focus-visible` ring in `--accent`.
-- Contrast: `--ink` on `--paper` ≥ 12:1; `--ink-soft` and `--accent` ≥ 4.5:1. **Compute it, do not
-  judge it by eye** — the dark accent looked fine and measured 4.01:1. Verify in **both** themes
-  before changing any token; the dark palette is the one that fails, because a mid-tone that reads as
-  restrained on bone loses its margin against dark stock.
+- Contrast, against `--paper`: `--ink` ≥ 7:1 (it is 8.6), `--ink-soft` and `--accent` ≥ 4.5:1.
+  **Compute it, do not judge it by eye** — a dark accent once looked fine and measured 4.01:1. Check
+  the worst dark speck of the grain too (≈ `#AAA29E`), not only the mean.
 - Hit targets ≥ 44px even where the visual mark is a 1px rule.
 
 ---
@@ -205,23 +274,27 @@ Non-negotiable, because the whole site is one animated object:
 
 - TypeScript strict. No `any`. Content types exported from `lib/content.ts`.
 - Named exports for components; default export only for Next's `page`/`layout`.
-- Comments explain *why* (the dip, the pivot maths) — never *what*.
+- Comments explain *why* (the hinge, the overscan, the measured numbers) — never *what*.
 - `npm run dev` on :3000, `npm run build` must pass clean before anything is called done.
-- **Verify visually, not just by build.** The turn is the product; a green build says nothing about
-  it. Screenshot front, midpoint and reverse after any change to the transforms — and the
-  reduced-motion path, which normal scrolling will never show you.
-- **Measure containment, do not eyeball it.** `getBoundingClientRect()` on `.flipper` returns the
-  projected bounds of the 3D plane. Sweep `--e` from 0 to 1 and assert `left >= 0 && right <=
-  innerWidth` at every step, across viewports from 390px to 2560px. A clipped corner at one angle on
-  one aspect ratio is invisible in a screenshot of a different angle.
-- Responsive: the page is always full bleed. Below 900px the grid drops to 2 columns, below 620px to
-  1 with the reverse scrolling internally, and the drawer goes near-full-width. The turn is unchanged.
+- **Verify visually, not just by build.** The pull is the product; a green build says nothing about
+  it. Screenshot the card at rest, three or four points through the pull, the sheet after it — and
+  the reduced-motion path.
+- **Measure the void, do not eyeball it.** Step the pull from 0 to 100% and count on-screen pixels
+  darker than the card can ever be (luminance < 22 — only `--field` gets there). It must be zero at
+  every step, across viewports from 390px to 2560px wide. A sliver that opens at one angle on one
+  aspect ratio is invisible in a screenshot of a different one.
+- **Measure the card against the photo**, same script both sides, before and after touching §2's
+  layout table: render the photo's own text at 987 × 627 and compare line positions and widths.
+- Responsive: the card is always full bleed. Below 900px the projects drop to 2 per row, below 620px
+  to 1, and the drawer goes near-full-width. The pull is unchanged.
 
 ## 8. Taste guardrails
 
-Do not add: gradients on the card, glassmorphism, emoji, a hero CTA button, a testimonials section,
-a skills bar chart, parallax on anything but the card, more than one accent colour, or a font weight
-you cannot justify. If a change makes the page look like a SaaS landing page, it is wrong.
+Do not add: gradients on the card, a border or trim on the card, glassmorphism, emoji, a hero CTA
+button, a scroll hint (the peek is the affordance), a testimonials section, a skills bar chart,
+parallax on anything but the card, more than one accent colour, a second typeface, or a font weight
+you cannot justify. If a change makes the page look like a SaaS landing page, it is wrong. If it
+makes the card look less like the photo, it is also wrong.
 
 <!-- BEGIN:nextjs-agent-rules -->
 
