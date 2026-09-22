@@ -3,20 +3,34 @@
  * Swap the placeholders below and the whole site becomes yours.
  */
 
+/**
+ * The card face, element for element, in the positions of the reference card
+ * (Paul Allen's, Pierce & Pierce). See CLAUDE.md §2 "Layout" for where each
+ * one sits.
+ */
 export type Identity = {
+  /** Top left — "212.555.6342" on the reference. */
+  phone: string;
+  /**
+   * Top right, where "PIERCE & PIERCE" sits. This is the Careers trigger. An
+   * "&" in it prints smaller, as on the card.
+   */
+  careersLabel: string;
+  /**
+   * Under the label — "MERGERS AND ACQUISITIONS". It is spread to exactly the
+   * label's width, so any length works, but a line with a word gap or two
+   * reads best.
+   */
+  careersSub: string;
+  /** Centred, in capitals. */
   name: string;
+  /** Under the name, in sentence case — "Vice President" on the reference. */
   title: string;
   /**
-   * The one sentence in the middle of the card. Sentence case, not uppercase —
-   * it is the only element on either face that is, deliberately. Keep it under
-   * ~120 characters or it stops being a statement and becomes a paragraph.
+   * The two centred lines along the bottom — "358 EXCHANGE PLACE…" and
+   * "FAX … TELEX …". Figures print smaller than the capitals around them.
    */
-  statement: string;
-  /** Sits where "PIERCE & PIERCE" does on the Paul Allen card. This is the Careers trigger. */
-  careersLabel: string;
-  careersSub: string;
-  /** The tiny letterspaced strip along the bottom edge of the card. */
-  contact: string[];
+  address: [string, string];
 };
 
 export type Project = {
@@ -46,23 +60,17 @@ export type CareerNode = {
 // ---------------------------------------------------------------------------
 
 export const identity: Identity = {
-  name: 'Your Name',
-  title: 'Software Engineer',
-  statement:
-    'I build systems that hold up under load — ingestion paths, query layers, and the unglamorous middle of the stack.',
+  phone: '024.555.0142',
   careersLabel: 'Careers',
   careersSub: 'Selected Experience',
-  contact: [
-    '358 Exchange Place',
-    'Hanoi, VN',
-    'you@example.com',
-    '+84 000 000 000',
-  ],
+  name: 'Your Name',
+  title: 'Software Engineer',
+  address: ['358 Exchange Place Hanoi Vietnam 10000', 'Email you@example.com'],
 };
 
 /**
- * Six tiles — two rows of three. That is what fits the flipped panel without a
- * nested scrollbar. Curate rather than append. (See CLAUDE.md §5.)
+ * Three to a row. The projects sheet scrolls, so there is no fixed count —
+ * but a row that ends one short reads as unfinished; multiples of three.
  */
 export const projects: Project[] = [
   {
